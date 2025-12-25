@@ -13,3 +13,31 @@ code {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
+
+.ant-form-item-explain-error {
+  margin-bottom: 10px;
+  /* or 6px */
+}
+
+/* Reduce space below label */
+.ant-form-item-label {
+  padding-bottom: 4px !important;
+}
+
+/* Reduce space between form items */
+.ant-form-item {
+  margin-bottom: 16px;
+}
+
+.ant-form-item-control-input {
+  min-height: auto;
+}
+
+section {
+  padding-inline: 5rem;
+}
+
+h1 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}

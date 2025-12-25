@@ -14,10 +14,10 @@ const NotFoundPage = () => {
       </p>
 
       <Link
-        to="/login"
+        to="/dashboard"
         className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
       >
-        Kembali ke Login
+        Kembali ke Dashboard
       </Link>
     </main>
   );

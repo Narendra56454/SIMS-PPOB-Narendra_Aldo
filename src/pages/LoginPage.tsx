@@ -1,16 +1,49 @@
-import React from "react";
-import { Form, Input } from "antd";
+import React, { useState } from "react";
+import { Form, Input, message } from "antd";
 import { LockOutlined } from "@ant-design/icons";
+import { Link, useNavigate } from "react-router-dom";
 import { Logo } from "../components/Logo";
 import ilustrasi from "../assets/ilustrasi-login.png";
 import { Button } from "../components/Button";
-import { Link } from "react-router-dom";
+import { login } from "../api/auth";
+
+interface LoginPayload {
+  email: string;
+  password: string;
+}
 
 const LoginPage: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = async (values: LoginPayload) => {
+    try {
+      setLoading(true);
+
+      const result = await login(values);
+      console.log(result);
+
+      if (result.status !== 0) {
+        throw new Error(result.message);
+      }
+
+      message.success(result.message);
+
+      // const token = result.data.token;
+      // localStorage.setItem("token", token);
+
+      navigate("/dashboard");
+    } catch (error: any) {
+      message.error(error.message || "Login gagal");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen flex">
       {/* LEFT SECTION */}
-      <section className="w-1/2 flex flex-col justify-center px-20">
+      <section className="w-1/2 flex flex-col justify-center">
         <div className="mb-4 self-center">
           <Logo size={24} />
         </div>
@@ -19,15 +52,29 @@ const LoginPage: React.FC = () => {
           Masuk atau buat akun <br /> untuk memulai
         </h1>
 
-        <Form layout="vertical" size="large" className="w-[80%] self-center">
-          <Form.Item name="email">
-            <Input
-              prefix="@"
-              placeholder="masukan email anda"
-            />
+        <Form
+          layout="vertical"
+          size="large"
+          className="w-[80%] self-center"
+          onFinish={handleLogin}
+        >
+          <Form.Item
+            name="email"
+            rules={[
+              { required: true, message: "Email wajib diisi" },
+              { type: "email", message: "Format email tidak valid" },
+            ]}
+          >
+            <Input prefix="@" placeholder="masukan email anda" />
           </Form.Item>
 
-          <Form.Item name="password">
+          <Form.Item
+            name="password"
+            rules={[
+              { required: true, message: "Password wajib diisi" },
+              { min: 8, message: "Password minimal 8 karakter" },
+            ]}
+          >
             <Input.Password
               prefix={<LockOutlined />}
               placeholder="masukan password anda"
@@ -35,7 +82,15 @@ const LoginPage: React.FC = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button className="w-full" variant="primary" size="sm">Masuk</Button>
+            <Button
+              className="w-full"
+              variant="primary"
+              size="sm"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Memproses..." : "Masuk"}
+            </Button>
           </Form.Item>
         </Form>
 

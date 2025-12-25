@@ -1,16 +1,52 @@
-import React from "react";
-import { Form, Input } from "antd";
+import React, { useState } from "react";
+import { Form, Input, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { Link, useNavigate } from "react-router-dom";
 import { Logo } from "../components/Logo";
 import ilustrasi from "../assets/ilustrasi-login.png";
 import { Button } from "../components/Button";
-import { Link } from "react-router-dom";
+import { register } from "../api/auth";
 
-const LoginPage: React.FC = () => {
+interface RegisterFormValues {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  confirmPassword: string;
+}
+
+const RegisterPage: React.FC = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleRegister = async (values: RegisterFormValues) => {
+    try {
+      setLoading(true);
+
+      const result = await register({
+        email: values.email,
+        password: values.password,
+        first_name: values.firstName,
+        last_name: values.lastName,
+      });
+
+      if (result.status !== 0) {
+        throw new Error(result.message);
+      }
+
+      message.success("Registrasi berhasil, silakan login");
+      navigate("/login");
+    } catch (error: any) {
+      message.error(error.message || "Registrasi gagal");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen flex">
       {/* LEFT SECTION */}
-      <section className="w-1/2 my-10 flex flex-col justify-center px-20">
+      <section className="w-1/2 my-10 flex flex-col justify-center">
         <div className="mb-4 self-center">
           <Logo size={24} />
         </div>
@@ -19,36 +55,74 @@ const LoginPage: React.FC = () => {
           Lengkapi data untuk <br /> membuat akun
         </h1>
 
-        <Form layout="vertical" size="large" className="w-[80%] self-center">
-          <Form.Item name="email">
-            <Input
-              prefix="@"
-              placeholder="masukan email anda"
-            />
+        <Form
+          layout="vertical"
+          size="large"
+          className="w-[80%] self-center"
+          onFinish={handleRegister}
+        >
+          <Form.Item
+            name="email"
+            rules={[
+              { required: true, message: "Email wajib diisi" },
+              { type: "email", message: "Format email tidak valid" },
+            ]}
+          >
+            <Input prefix="@" placeholder="masukan email anda" />
           </Form.Item>
 
-          <Form.Item name="firstName">
+          <Form.Item
+            name="firstName"
+            rules={[{ required: true, message: "Nama depan wajib diisi" }]}
+          >
             <Input
               prefix={<UserOutlined />}
               placeholder="nama depan"
             />
           </Form.Item>
 
-          <Form.Item name="lastName">
+          <Form.Item
+            name="lastName"
+            rules={[{ required: true, message: "Nama belakang wajib diisi" }]}
+          >
             <Input
               prefix={<UserOutlined />}
               placeholder="nama belakang"
             />
           </Form.Item>
 
-          <Form.Item name="password">
+          <Form.Item
+            name="password"
+            rules={[
+              { required: true, message: "Password wajib diisi" },
+              { min: 8, message: "Password minimal 8 karakter" },
+            ]}
+            hasFeedback
+          >
             <Input.Password
               prefix={<LockOutlined />}
               placeholder="buat password"
             />
           </Form.Item>
 
-          <Form.Item name="confirmPassword">
+          <Form.Item
+            name="confirmPassword"
+            dependencies={["password"]}
+            hasFeedback
+            rules={[
+              { required: true, message: "Konfirmasi password wajib diisi" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue("password") === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error("Password tidak sama")
+                  );
+                },
+              }),
+            ]}
+          >
             <Input.Password
               prefix={<LockOutlined />}
               placeholder="konfirmasi password"
@@ -56,7 +130,15 @@ const LoginPage: React.FC = () => {
           </Form.Item>
 
           <Form.Item>
-            <Button className="w-full" variant="primary" size="sm">Masuk</Button>
+            <Button
+              className="w-full"
+              variant="primary"
+              size="sm"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Memproses..." : "Daftar"}
+            </Button>
           </Form.Item>
         </Form>
 
@@ -66,7 +148,7 @@ const LoginPage: React.FC = () => {
             to="/login"
             className="text-red-600 font-medium hover:underline"
           >
-            registrasi di sini
+            login di sini
           </Link>
         </p>
       </section>
@@ -75,7 +157,7 @@ const LoginPage: React.FC = () => {
       <section className="w-1/2 bg-red-50 flex items-center justify-center">
         <img
           src={ilustrasi}
-          alt="Ilustrasi Login"
+          alt="Ilustrasi Register"
           className="max-w-105"
         />
       </section>
@@ -83,4 +165,4 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
