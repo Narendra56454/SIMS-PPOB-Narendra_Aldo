@@ -24,7 +24,6 @@ const AccountPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [avatar, setAvatar] = useState<string>(avatarPlaceholder);
 
-  // Ref for hidden file input
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const dispatch = useDispatch<AppDispatch>();
@@ -82,7 +81,6 @@ const AccountPage: React.FC = () => {
       return;
     }
 
-    // Preview avatar immediately
     const reader = new FileReader();
     reader.onload = () => {
       setAvatar(reader.result as string);

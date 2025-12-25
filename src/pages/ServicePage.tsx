@@ -36,7 +36,7 @@ export const ServicePage = () => {
 
     const { data, error } = useSelector((state: RootState) => state.transaction);
     const { data: balanceData } = useSelector((state: RootState) => state.balance);
-    console.log(data);
+    
     const balance = balanceData?.balance ?? 0;
     const invalidAmount = typeof amount === "number" && amount > balance;
 
