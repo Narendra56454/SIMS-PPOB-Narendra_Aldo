@@ -7,8 +7,10 @@ interface AuthState {
     error: string | null;
 }
 
+const tokenFromStorage = localStorage.getItem("token");
+
 const initialState: AuthState = {
-    token: null,
+    token: tokenFromStorage,
     loading: false,
     error: null,
 };
@@ -35,6 +37,7 @@ const authSlice = createSlice({
     reducers: {
         logout: (state) => {
             state.token = null;
+            localStorage.removeItem("token");
         },
     },
     extraReducers: (builder) => {
@@ -46,6 +49,7 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.token = action.payload;
+                localStorage.setItem("token", action.payload);
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
@@ -53,6 +57,7 @@ const authSlice = createSlice({
             });
     },
 });
+
 
 export const { logout } = authSlice.actions;
 export default authSlice.reducer;
