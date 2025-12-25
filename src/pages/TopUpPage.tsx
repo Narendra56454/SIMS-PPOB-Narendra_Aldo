@@ -3,8 +3,13 @@ import { WelcomeAndBalance } from "../components/WelcomeAndBalance"
 import { Input } from "antd";
 import { WalletOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { PopUp } from "../components/PopUp";
+import { ConfirmPopUp, PopUp } from "../components/PopUp";
 import { Button } from "../components/Button";
+import { formatNumber, parseNumber } from "../components/Utils";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store";
+import { resetTopUp, topUp } from "../store/topUpSlice";
+import { useNavigate } from "react-router-dom";
 
 const PRESET_AMOUNTS = [
     "Rp10.000",
@@ -16,7 +21,28 @@ const PRESET_AMOUNTS = [
 ];
 
 export const TopUpPage = () => {
+    const navigate = useNavigate();
     const [openPopUp, setOpenPopUp] = useState(false);
+    const [amount, setAmount] = useState<number>();
+    const [activePreset, setActivePreset] = useState<number | null>(null);
+
+    const isValidAmount = typeof amount === "number" && amount >= 10000 && amount <= 1000000;
+
+    const dispatch = useDispatch<AppDispatch>();
+    const token = useSelector((state: RootState) => state.auth.token);
+
+    const { data, error } = useSelector((state: RootState) => state.topUp);
+    const handleConfirm = () => {
+        if (!token || !amount) return;
+
+        dispatch(topUp({ token, amount }));
+        setOpenPopUp(false);
+    }
+
+    const handleClose = () => {
+        dispatch(resetTopUp()); // clear data & error
+        navigate("/"); 
+    }
 
     return (
         <main>
@@ -33,37 +59,72 @@ export const TopUpPage = () => {
                 <div className="mt-6 flex gap-6">
                     <div className="w-[60%] space-y-4">
                         <Input
-                            prefix={<WalletOutlined />}
+                            prefix={<WalletOutlined className="mr-2" />}
                             size="large"
                             placeholder="masukan nominal Top Up"
                             className="h-12"
+                            value={amount ? formatNumber(amount) : ""}
+                            onChange={(e) => {
+                                const numericValue = parseNumber(e.target.value);
+                                setAmount(numericValue);
+                                setActivePreset(null);
+                            }}
                         />
 
-                        <Button variant="primary" className="w-full" onClick={() => setOpenPopUp(true)}>Top up</Button>
+                        <Button
+                            variant="primary"
+                            className="w-full"
+                            onClick={() => {
+                                if (!isValidAmount) return;
+                                setOpenPopUp(true);
+                            }}
+                            disabled={!isValidAmount}
+                        >
+                            Top up
+                        </Button>
                     </div>
 
                     <div className="grid grid-cols-3 gap-3 w-65">
-                        {PRESET_AMOUNTS.map((amount) => (
-                            <button
-                                key={amount}
-                                className="h-12 rounded-md border border-gray-300 text-sm font-medium hover:border-red-500 hover:text-red-500 transition"
-                            >
-                                {amount}
-                            </button>
-                        ))}
+                        {PRESET_AMOUNTS.map((preset) => {
+                            const numericValue = parseNumber(preset);
+                            const isActive = activePreset === numericValue;
+
+                            return (
+                                <Button
+                                    key={preset}
+                                    variant={isActive ? "primary" : "grayTransparent"}
+                                    className={`h-12 rounded-md border text-sm font-medium transition 
+                                        ${isActive ? "border-red-600" : "border-gray-300 hover:border-red-500 hover:text-red-500"}`}
+                                    onClick={() => {
+                                        setAmount(numericValue);
+                                        setActivePreset(numericValue);
+                                    }}
+                                >
+                                    {preset}
+                                </Button>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
 
+            {/* CONFIRM POPUP */}
             {openPopUp && (
-                <PopUp
-                    header="Beli Listrik Prabayar"
-                    content="10.000"
-                    onConfirm={() => {
-                        console.log("Confirmed");
-                        setOpenPopUp(false);
-                    }}
+                <ConfirmPopUp
+                    header="Top Up sebesar"
+                    content={`${formatNumber(amount ?? 0)}`}
+                    onConfirm={handleConfirm}
                     onClose={() => setOpenPopUp(false)} />
+            )}
+
+            {/* RESULT POPUP */}
+            {(data || error) && (
+                <PopUp
+                    header="Top Up sebesar"
+                    content={`${formatNumber(amount ?? 0)}`}
+                    result={Boolean(data)}
+                    onClose={handleClose}
+                />
             )}
         </main>
     )

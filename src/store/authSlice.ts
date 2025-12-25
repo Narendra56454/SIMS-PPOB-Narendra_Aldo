@@ -7,7 +7,24 @@ interface AuthState {
     error: string | null;
 }
 
-const tokenFromStorage = localStorage.getItem("token");
+const TOKEN_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
+
+const getStoredAuth = () => {
+    const token = localStorage.getItem("token");
+    const expiry = localStorage.getItem("token_expiry");
+
+    if (!token || !expiry) return null;
+
+    if (Date.now() > Number(expiry)) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("token_expiry");
+        return null;
+    }
+
+    return token;
+};
+
+const tokenFromStorage = getStoredAuth();
 
 const initialState: AuthState = {
     token: tokenFromStorage,
@@ -38,6 +55,7 @@ const authSlice = createSlice({
         logout: (state) => {
             state.token = null;
             localStorage.removeItem("token");
+            localStorage.removeItem("token_expiry");
         },
     },
     extraReducers: (builder) => {
@@ -49,7 +67,10 @@ const authSlice = createSlice({
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
                 state.token = action.payload;
+
+                const expiryTime = Date.now() + TOKEN_EXPIRY_MS;
                 localStorage.setItem("token", action.payload);
+                localStorage.setItem("token_expiry", expiryTime.toString());
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;

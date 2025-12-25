@@ -5,13 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import { fetchBalance } from "../store/balanceSlice";
-
-const formatRupiah = (value: number) =>
-    new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-    }).format(value);
+import { formatRupiah } from "./Utils";
 
 export const BalanceCard = () => {
     const [isHidden, setIsHidden] = useState(true);

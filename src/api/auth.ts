@@ -16,7 +16,6 @@ export interface RegisterPayload {
   last_name: string;
 }
 
-// ENDPOINTS
 export const login = (payload: LoginPayload) => {
   return apiFetch<LoginResponse>("/login", {
     method: "POST",

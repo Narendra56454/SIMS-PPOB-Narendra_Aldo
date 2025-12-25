@@ -10,6 +10,7 @@ export const Button = ({
     size = "md",
     className = "",
     type = "button",
+    disabled,
     ...props
 }: Props) => {
     const base = "inline-flex items-center justify-center rounded-md font-semibold ";
@@ -21,6 +22,8 @@ export const Button = ({
         grayTransparent: "bg-transparent text-gray-600 hover:bg-red-50",
     };
 
+    const disabledStyles = "bg-gray-300 text-white";
+
     const sizes: Record<string, string> = {
         sm: "h-9 px-3 text-sm",
         md: "h-11 px-4 text-base",
@@ -31,7 +34,7 @@ export const Button = ({
         <button
             type={type}
             {...props}
-            className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
+            className={`${base} ${sizes[size]} ${disabled ? disabledStyles : variants[variant]} ${className}`}
         />
     );
 };

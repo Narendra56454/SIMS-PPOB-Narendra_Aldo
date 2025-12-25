@@ -3,10 +3,10 @@ import { Header } from "../components/Header"
 import { WelcomeAndBalance } from "../components/WelcomeAndBalance"
 import { Input } from "antd";
 import { WalletOutlined } from "@ant-design/icons";
-import pbb from "../assets/pbb.png";
 import { Button } from "../components/Button";
 import { useState } from "react";
-import { PopUp } from "../components/PopUp";
+import { ConfirmPopUp } from "../components/PopUp";
+import { formatNumber } from "../components/Utils";
 
 interface Service {
     service_code: string;
@@ -19,14 +19,19 @@ export const ServicePage = () => {
     const { state } = useLocation();
     const navigate = useNavigate();
 
-    const [openPopUp, setOpenPopUp] = useState(false);
-
     const service = state as Service;
 
     // Safety check (refresh protection)
     if (!service) {
         navigate("/");
         return null;
+    }
+
+    const [amount] = useState<number>(service.service_tariff ?? 0);
+    const [openPopUp, setOpenPopUp] = useState(false);
+
+    const handleTransaction = () => {
+        setOpenPopUp(false);
     }
 
     return (
@@ -40,17 +45,23 @@ export const ServicePage = () => {
             <section className="py-10 space-y-4">
                 <div>
                     <p>Pembayaran</p>
-                    <div className="flex items-center gap-2">
-                        <img src={pbb} alt="Service Icon" className="w-8 h-8" />
+                    <div className="mt-2 flex items-center gap-2">
+                        <img src={service.service_icon} alt="Service Icon" className="w-8 h-8" />
                         <h1>{service.service_name}</h1>
                     </div>
                 </div>
 
                 <Input
-                    prefix={<WalletOutlined />}
+                    prefix={<WalletOutlined className="mr-2" />}
                     size="large"
-                    placeholder="masukan nominal Top Up"
+                    placeholder="masukan nominal"
                     className="h-12"
+                    value={amount ? formatNumber(amount) : ""}
+                    // onChange={(e) => {
+                    //     const numericValue = parseNumber(e.target.value);
+                    //     setAmount(numericValue);
+                    // }}
+                    disabled
                 />
 
                 <Button
@@ -65,13 +76,10 @@ export const ServicePage = () => {
             </section>
 
             {openPopUp && (
-                <PopUp
-                    header="Beli Listrik Prabayar"
-                    content="10.000"
-                    onConfirm={() => {
-                        console.log("Confirmed");
-                        setOpenPopUp(false);
-                    }}
+                <ConfirmPopUp
+                    header={`Bayar ${service.service_name} senilai`}
+                    content={`${formatNumber(amount)} ?`}
+                    onConfirm={handleTransaction}
                     onClose={() => setOpenPopUp(false)} />
             )}
         </main>

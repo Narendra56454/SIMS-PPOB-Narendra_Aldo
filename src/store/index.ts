@@ -4,6 +4,7 @@ import serviceReducer from "./serviceSlice";
 import bannerReducer from "./bannerSlice";
 import profileReducer from "./profileSlice";
 import balanceReducer from "./balanceSlice";
+import topupReducer from "./topUpSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     banners: bannerReducer,
     profile: profileReducer,
     balance: balanceReducer,
+    topUp: topupReducer,
   },
 });
 
