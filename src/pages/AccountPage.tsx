@@ -1,11 +1,16 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Header } from "../components/Header";
 import { EditOutlined, UserOutlined } from "@ant-design/icons";
 import avatarPlaceholder from "../assets/profile-photo.png";
 import { Button } from "../components/Button";
-import { Input, Form } from "antd";
+import { Input, Form, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { Avatar } from "../components/Avatar";
+import { fetchProfile, putProfile } from "../store/profileSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store";
+import { putAvatar } from "../store/profileSlice";
+import { logout } from "../store/authSlice";
 
 interface ProfileForm {
   email: string;
@@ -13,7 +18,7 @@ interface ProfileForm {
   lastName: string;
 }
 
-const DashboardPage: React.FC = () => {
+const AccountPage: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm<ProfileForm>();
   const [isEditing, setIsEditing] = useState(false);
@@ -22,11 +27,38 @@ const DashboardPage: React.FC = () => {
   // Ref for hidden file input
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const initialProfile: ProfileForm = {
-    email: "wallet@nutech.com",
-    firstName: "Kristanto",
-    lastName: "Wibowo",
-  };
+  const dispatch = useDispatch<AppDispatch>();
+
+  const token = useSelector((state: RootState) => state.auth.token);
+
+  const {
+    data: profile,
+    loading: profileLoading,
+  } = useSelector((state: RootState) => state.profile);
+
+  // Fetch data
+  useEffect(() => {
+    if (!token) return;
+
+    dispatch(fetchProfile(token));
+  }, [dispatch, token]);
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    }
+  }, [token, navigate]);
+
+  useEffect(() => {
+    if (profile) {
+      form.setFieldsValue({
+        email: profile.email,
+        firstName: profile.first_name,
+        lastName: profile.last_name,
+      });
+      setAvatar(profile.profile_image || avatarPlaceholder);
+    }
+  }, [profile, form]);
 
   const handleEditAvatar = () => {
     fileInputRef.current?.click(); // Open file picker
@@ -34,29 +66,62 @@ const DashboardPage: React.FC = () => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setAvatar(reader.result as string); // Update avatar preview
-      };
-      reader.readAsDataURL(file);
-      // TODO: upload file to server if needed
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ["image/jpeg", "image/png"];
+    if (!allowedTypes.includes(file.type)) {
+      message.error("Hanya file JPG atau PNG yang diperbolehkan.");
+      return;
+    }
+
+    // Validate file size (max 100 KB)
+    const maxSizeKB = 100;
+    if (file.size / 1024 > maxSizeKB) {
+      message.error(`Ukuran file maksimal ${maxSizeKB} KB.`);
+      return;
+    }
+
+    // Preview avatar immediately
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAvatar(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    if (token) {
+      dispatch(putAvatar({ token, file }));
     }
   };
 
   const handleBatal = () => {
-    form.resetFields();
+    if (profile) {
+      form.setFieldsValue({
+        email: profile.email,
+        firstName: profile.first_name,
+        lastName: profile.last_name,
+      });
+      setAvatar(profile.profile_image || avatarPlaceholder);
+    }
     setIsEditing(false);
   };
 
   const handleSave = async () => {
-    const values = await form.validateFields();
-    console.log("Saving profile:", values);
+    if (!token) return;
+
+    dispatch(putProfile({
+      token,
+      payload: {
+        first_name: "User Edited",
+        last_name: "Nutech Edited",
+      },
+    }));
+
     setIsEditing(false);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    dispatch(logout());
     navigate("/login");
   };
 
@@ -71,7 +136,7 @@ const DashboardPage: React.FC = () => {
             <Avatar image={avatar} />
 
             <button
-              className="absolute bottom-0 right-0 bg-white border rounded-full p-2 shadow hover:bg-gray-100"
+              className="absolute w-8 h-8 bottom-0 right-0 bg-white border rounded-full cursor-pointer"
               title="Edit Avatar"
               onClick={handleEditAvatar}
             >
@@ -98,7 +163,6 @@ const DashboardPage: React.FC = () => {
           form={form}
           layout="vertical"
           size="large"
-          initialValues={initialProfile}
           className="w-full"
           requiredMark={false}
         >
@@ -112,7 +176,7 @@ const DashboardPage: React.FC = () => {
           >
             <Input
               prefix="@"
-              disabled={!isEditing}
+              disabled
               placeholder="masukkan email"
             />
           </Form.Item>
@@ -177,6 +241,7 @@ const DashboardPage: React.FC = () => {
                   size="sm"
                   type="button"
                   onClick={() => setIsEditing(true)}
+                  disabled={profileLoading}
                 >
                   Edit
                 </Button>
@@ -201,4 +266,4 @@ const DashboardPage: React.FC = () => {
   );
 };
 
-export default DashboardPage;
+export default AccountPage;
