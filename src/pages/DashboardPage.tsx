@@ -1,24 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Header } from "../components/Header";
 import baner from "../assets/banner-1.png";
-import pbb from "../assets/pbb.png";
 import { WelcomeAndBalance } from "../components/WelcomeAndBalance";
 import { useNavigate } from "react-router-dom";
-
-const services = [
-    {
-        service_code: "PAJAK",
-        service_name: "Pajak PBB",
-        service_icon: "https://nutech-integrasi.app/dummy.jpg",
-        service_tariff: 40000,
-    },
-    {
-        service_code: "PLN",
-        service_name: "Listrik",
-        service_icon: "https://nutech-integrasi.app/dummy.jpg",
-        service_tariff: 10000,
-    },
-];
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store";
+import { fetchServices } from "../store/serviceSlice";
 
 const banners = [
     {
@@ -35,11 +22,36 @@ const banners = [
 
 const DashboardPage: React.FC = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
 
-    const handleServiceClick = (service: typeof services[number]) => {
-        navigate("/service", {
-            state: service,
-        });
+    const servicesState = useSelector(
+        (state: RootState) => state.services
+    );
+
+    const {
+        data: services = [],
+        loading = false,
+        error = null,
+    } = servicesState || {};
+
+    const authState = useSelector((state: RootState) => state.auth);
+
+    const token = authState?.token ?? null;
+
+    useEffect(() => {
+        if (token) {
+            dispatch(fetchServices(token));
+        }
+    }, [dispatch, token]);
+
+    useEffect(() => {
+        if (authState.token === null || error === "UNAUTHORIZED") {
+            navigate("/login");
+        }
+    }, [error, navigate]);
+
+    const handleServiceClick = (service: any) => {
+        navigate("/service", { state: service });
     };
 
     return (
@@ -50,16 +62,18 @@ const DashboardPage: React.FC = () => {
                 <WelcomeAndBalance />
             </section>
 
-            {/* SERVICE ICONS */}
+            {/* SERVICE */}
             <section className="mt-8 flex items-center gap-4">
+                {loading && <p>Loading services...</p>}
+
                 {services.map((service) => (
                     <div
                         key={service.service_code}
-                        className="w-14 h-14 flex flex-col items-center cursor-pointer"
+                        className="w-24 h-24 flex flex-col items-center cursor-pointer"
                         onClick={() => handleServiceClick(service)}
                     >
                         <img
-                            src={pbb}
+                            src={service.service_icon}
                             alt={service.service_name}
                             className="w-12 h-12 object-contain"
                         />

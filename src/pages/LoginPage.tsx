@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Form, Input, message } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import { Logo } from "../components/Logo";
 import ilustrasi from "../assets/ilustrasi-login.png";
 import { Button } from "../components/Button";
-import { login } from "../api/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store";
+import { loginUser } from "../store/authSlice";
 
 interface LoginPayload {
   email: string;
@@ -13,32 +15,29 @@ interface LoginPayload {
 }
 
 const LoginPage: React.FC = () => {
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const handleLogin = async (values: LoginPayload) => {
-    try {
-      setLoading(true);
+  const { loading, error, token } = useSelector(
+    (state: RootState) => state.auth
+  );
 
-      const result = await login(values);
-      console.log(result);
-
-      if (result.status !== 0) {
-        throw new Error(result.message);
-      }
-
-      message.success(result.message);
-
-      // const token = result.data.token;
-      // localStorage.setItem("token", token);
-
-      navigate("/dashboard");
-    } catch (error: any) {
-      message.error(error.message || "Login gagal");
-    } finally {
-      setLoading(false);
-    }
+  const handleLogin = (values: LoginPayload) => {
+    dispatch(loginUser(values));
   };
+
+  useEffect(() => {
+    if (token) {
+      message.success("Login berhasil");
+      navigate("/dashboard");
+    }
+  }, [token, navigate]);
+
+  useEffect(() => {
+    if (error) {
+      message.error(error);
+    }
+  }, [error]);
 
   return (
     <main className="min-h-screen flex">
