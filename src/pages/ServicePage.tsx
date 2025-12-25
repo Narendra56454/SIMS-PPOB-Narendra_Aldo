@@ -5,8 +5,11 @@ import { Input } from "antd";
 import { WalletOutlined } from "@ant-design/icons";
 import { Button } from "../components/Button";
 import { useState } from "react";
-import { ConfirmPopUp } from "../components/PopUp";
+import { ConfirmPopUp, PopUp } from "../components/PopUp";
 import { formatNumber } from "../components/Utils";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../store";
+import { resetTransaction, transaction } from "../store/transactionSlice";
 
 interface Service {
     service_code: string;
@@ -20,8 +23,6 @@ export const ServicePage = () => {
     const navigate = useNavigate();
 
     const service = state as Service;
-
-    // Safety check (refresh protection)
     if (!service) {
         navigate("/");
         return null;
@@ -30,8 +31,25 @@ export const ServicePage = () => {
     const [amount] = useState<number>(service.service_tariff ?? 0);
     const [openPopUp, setOpenPopUp] = useState(false);
 
-    const handleTransaction = () => {
+    const dispatch = useDispatch<AppDispatch>();
+    const token = useSelector((state: RootState) => state.auth.token);
+
+    const { data, error } = useSelector((state: RootState) => state.transaction);
+    const { data: balanceData } = useSelector((state: RootState) => state.balance);
+    console.log(data);
+    const balance = balanceData?.balance ?? 0;
+    const invalidAmount = typeof amount === "number" && amount > balance;
+
+    const handleConfirm = () => {
+        if (!token || !amount) return;
+
+        dispatch(transaction({ token, code: service.service_code }));
         setOpenPopUp(false);
+    }
+
+    const handleClose = () => {
+        dispatch(resetTransaction()); // clear data & error
+        navigate("/");
     }
 
     return (
@@ -70,6 +88,7 @@ export const ServicePage = () => {
                     size="sm"
                     type="submit"
                     onClick={() => setOpenPopUp(true)}
+                    disabled={invalidAmount}
                 >
                     Bayar
                 </Button>
@@ -79,8 +98,18 @@ export const ServicePage = () => {
                 <ConfirmPopUp
                     header={`Bayar ${service.service_name} senilai`}
                     content={`${formatNumber(amount)} ?`}
-                    onConfirm={handleTransaction}
+                    onConfirm={handleConfirm}
                     onClose={() => setOpenPopUp(false)} />
+            )}
+
+            {/* RESULT POPUP */}
+            {(data || error) && (
+                <PopUp
+                    header={`Pembayaran ${service.service_name} sebesar`}
+                    content={`${formatNumber(amount ?? 0)}`}
+                    result={Boolean(data)}
+                    onClose={handleClose}
+                />
             )}
         </main>
     )

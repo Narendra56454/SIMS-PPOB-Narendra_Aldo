@@ -5,6 +5,7 @@ import bannerReducer from "./bannerSlice";
 import profileReducer from "./profileSlice";
 import balanceReducer from "./balanceSlice";
 import topupReducer from "./topUpSlice";
+import transactionReducer from "./transactionSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     profile: profileReducer,
     balance: balanceReducer,
     topUp: topupReducer,
+    transaction: transactionReducer,
   },
 });
 
