@@ -132,7 +132,9 @@ const AccountPage: React.FC = () => {
           {/* Avatar */}
           <div className="flex flex-col items-center mb-6">
             <div className="relative">
-              <Avatar image={avatar} />
+              <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center">
+                <Avatar image={avatar} size={10} className="w-full h-full object-cover" />
+              </div>
 
               <button
                 className="absolute w-8 h-8 bottom-0 right-0 bg-white border rounded-full
@@ -203,7 +205,7 @@ const AccountPage: React.FC = () => {
             </Form.Item>
 
             {/* Buttons */}
-            <div className="space-y-3">
+            <div className="space-y-3 mt-6">
               {isEditing ? (
                 <>
                   <Button

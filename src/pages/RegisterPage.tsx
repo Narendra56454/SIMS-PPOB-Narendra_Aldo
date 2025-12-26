@@ -46,7 +46,7 @@ const RegisterPage: React.FC = () => {
   return (
     <main className="min-h-screen flex flex-col md:flex-row">
       {/* LEFT SECTION */}
-      <section className="w-full md:w-1/2 flex flex-col justify-center my-10 md:my-4">
+      <section className="w-full md:w-1/2 flex flex-col justify-center px-6 my-10 md:my-4">
         <div className="mb-6 self-center">
           <Logo size={24} />
         </div>
