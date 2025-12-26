@@ -41,71 +41,78 @@ export const TopUpPage = () => {
 
     const handleClose = () => {
         dispatch(resetTopUp()); // clear data & error
-        navigate("/"); 
+        navigate("/");
     }
 
     return (
-        <main>
+        <main className="min-h-screen">
             <Header />
 
-            <section>
+            <section className="px-4 md:px-20">
                 <WelcomeAndBalance />
-            </section>
 
-            <section className="py-10">
-                <p>Silahkan Masukkan</p>
-                <h1>Nominal Top Up</h1>
+                <section className="py-10">
+                    <p className="text-sm text-gray-600">Silahkan Masukkan</p>
+                    <h1 className="text-xl md:text-2xl font-semibold">
+                        Nominal Top Up
+                    </h1>
 
-                <div className="mt-6 flex gap-6">
-                    <div className="w-[60%] space-y-4">
-                        <Input
-                            prefix={<WalletOutlined className="mr-2" />}
-                            size="large"
-                            placeholder="masukan nominal Top Up"
-                            className="h-12"
-                            value={amount ? formatNumber(amount) : ""}
-                            onChange={(e) => {
-                                const numericValue = parseNumber(e.target.value);
-                                setAmount(numericValue);
-                                setActivePreset(null);
-                            }}
-                        />
+                    <div className="mt-6 flex flex-col md:flex-row gap-6">
+                        {/* INPUT + BUTTON */}
+                        <div className="w-full md:w-[60%] space-y-4">
+                            <Input
+                                prefix={<WalletOutlined className="mr-2" />}
+                                size="large"
+                                placeholder="masukan nominal Top Up"
+                                className="h-12"
+                                value={amount ? formatNumber(amount) : ""}
+                                onChange={(e) => {
+                                    const numericValue = parseNumber(e.target.value);
+                                    setAmount(numericValue);
+                                    setActivePreset(null);
+                                }}
+                            />
 
-                        <Button
-                            variant="primary"
-                            className="w-full"
-                            onClick={() => {
-                                if (!isValidAmount) return;
-                                setOpenPopUp(true);
-                            }}
-                            disabled={!isValidAmount}
-                        >
-                            Top up
-                        </Button>
+                            <Button
+                                variant="primary"
+                                className="w-full"
+                                onClick={() => {
+                                    if (!isValidAmount) return;
+                                    setOpenPopUp(true);
+                                }}
+                                disabled={!isValidAmount}
+                            >
+                                Top up
+                            </Button>
+                        </div>
+
+                        {/* PRESET BUTTONS */}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full md:w-[40%]">
+                            {PRESET_AMOUNTS.map((preset) => {
+                                const numericValue = parseNumber(preset);
+                                const isActive = activePreset === numericValue;
+
+                                return (
+                                    <Button
+                                        key={preset}
+                                        variant={isActive ? "primary" : "grayTransparent"}
+                                        className={`h-12 rounded-md border text-sm font-medium transition
+                    ${isActive
+                                                ? "border-red-600"
+                                                : "border-gray-300 hover:border-red-500 hover:text-red-500"
+                                            }`}
+                                        onClick={() => {
+                                            setAmount(numericValue);
+                                            setActivePreset(numericValue);
+                                        }}
+                                    >
+                                        {preset}
+                                    </Button>
+                                );
+                            })}
+                        </div>
                     </div>
-
-                    <div className="grid grid-cols-3 gap-3 w-65">
-                        {PRESET_AMOUNTS.map((preset) => {
-                            const numericValue = parseNumber(preset);
-                            const isActive = activePreset === numericValue;
-
-                            return (
-                                <Button
-                                    key={preset}
-                                    variant={isActive ? "primary" : "grayTransparent"}
-                                    className={`h-12 rounded-md border text-sm font-medium transition 
-                                        ${isActive ? "border-red-600" : "border-gray-300 hover:border-red-500 hover:text-red-500"}`}
-                                    onClick={() => {
-                                        setAmount(numericValue);
-                                        setActivePreset(numericValue);
-                                    }}
-                                >
-                                    {preset}
-                                </Button>
-                            );
-                        })}
-                    </div>
-                </div>
+                </section>
             </section>
 
             {/* CONFIRM POPUP */}
@@ -114,7 +121,8 @@ export const TopUpPage = () => {
                     header="Top Up sebesar"
                     content={`${formatNumber(amount ?? 0)}`}
                     onConfirm={handleConfirm}
-                    onClose={() => setOpenPopUp(false)} />
+                    onClose={() => setOpenPopUp(false)}
+                />
             )}
 
             {/* RESULT POPUP */}
@@ -127,5 +135,5 @@ export const TopUpPage = () => {
                 />
             )}
         </main>
-    )
+    );
 }

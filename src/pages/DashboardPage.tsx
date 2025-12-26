@@ -43,59 +43,59 @@ const DashboardPage: React.FC = () => {
     };
 
     return (
-        <main>
+        <main className="min-h-screen">
             <Header />
 
-            <section>
+            <section className="px-4 md:px-20">
                 <WelcomeAndBalance />
-            </section>
 
-            {/* SERVICE */}
-            <section className="mt-10 flex items-center gap-4 overflow-x-auto">
-                {servicesLoading && <p>Loading services...</p>}
+                {/* SERVICES */}
+                <section className="mt-10 flex gap-4 overflow-x-auto">
+                    {servicesLoading && <p>Loading services...</p>}
 
-                {!servicesLoading && Array.isArray(services) &&
-                    services.map((service) => (
-                        <div
-                            key={service.service_code}
-                            className="w-24 h-24 flex flex-col items-center cursor-pointer"
-                            onClick={() => handleServiceClick(service)}
-                        >
-                            <img
-                                src={service.service_icon}
-                                alt={service.service_name}
-                                className="w-12 h-12 object-contain"
-                            />
-                            <p className="text-sm text-center">
-                                {service.service_name}
-                            </p>
-                        </div>
-                    ))}
-            </section>
-
-            {/* BANNERS */}
-            <section className="mt-10 mb-10">
-                <h2 className="mb-4 font-semibold text-lg">Temukan promo menarik</h2>
-
-                {bannersLoading && <p>Loading banners...</p>}
-
-                <div className="flex gap-6 overflow-x-auto">
-                    {!bannersLoading && Array.isArray(banners) &&
-                        banners.map((banner) => (
+                    {!servicesLoading &&
+                        services?.map((service) => (
                             <div
-                                key={banner.banner_name}
-                                className="min-w-[320px] h-30 rounded-xl overflow-hidden bg-white flex flex-col"
+                                key={service.service_code}
+                                className="min-w-15 flex flex-col items-center cursor-pointer"
+                                onClick={() => handleServiceClick(service)}
                             >
-                                <div className="h-30 w-full bg-gray-100">
+                                <img
+                                    src={service.service_icon}
+                                    alt={service.service_name}
+                                    className="w-12 h-12 object-contain"
+                                />
+                                <p className="text-xs text-center mt-1">
+                                    {service.service_name}
+                                </p>
+                            </div>
+                        ))}
+                </section>
+
+                {/* BANNERS */}
+                <section className="mt-10 mb-10">
+                    <h2 className="mb-4 font-semibold text-lg">
+                        Temukan promo menarik
+                    </h2>
+
+                    {bannersLoading && <p>Loading banners...</p>}
+
+                    <div className="flex gap-4 overflow-x-auto">
+                        {!bannersLoading &&
+                            banners?.map((banner) => (
+                                <div
+                                    key={banner.banner_name}
+                                    className="min-w-70 md:min-w-[320px] h-36 rounded-xl overflow-hidden"
+                                >
                                     <img
                                         src={banner.banner_image}
                                         alt={banner.banner_name}
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
-                            </div>
-                        ))}
-                </div>
+                            ))}
+                    </div>
+                </section>
             </section>
         </main>
     );

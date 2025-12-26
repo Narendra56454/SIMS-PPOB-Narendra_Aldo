@@ -40,21 +40,21 @@ const LoginPage: React.FC = () => {
   }, [error]);
 
   return (
-    <main className="min-h-screen flex">
+    <main className="min-h-screen flex flex-col md:flex-row">
       {/* LEFT SECTION */}
-      <section className="w-1/2 flex flex-col justify-center">
-        <div className="mb-4 self-center">
+      <section className="w-full md:w-1/2 mt-10 flex flex-col justify-center px-6">
+        <div className="mb-6 self-center">
           <Logo size={24} />
         </div>
 
         <h1 className="text-2xl font-semibold text-gray-900 mb-8 text-center">
-          Masuk atau buat akun <br /> untuk memulai
+          Masuk atau buat akun <br className="hidden sm:block" /> untuk memulai
         </h1>
 
         <Form
           layout="vertical"
           size="large"
-          className="w-[80%] self-center"
+          className="w-full max-w-md self-center"
           onFinish={handleLogin}
         >
           <Form.Item
@@ -104,12 +104,12 @@ const LoginPage: React.FC = () => {
         </p>
       </section>
 
-      {/* RIGHT SECTION */}
-      <section className="w-1/2 bg-red-50 flex items-center justify-center">
+      {/* RIGHT SECTION (hidden on mobile) */}
+      <section className="hidden md:flex w-1/2 bg-red-50 items-center justify-center">
         <img
           src={ilustrasi}
           alt="Ilustrasi Login"
-          className="max-w-105"
+          className="max-w-md w-full px-6"
         />
       </section>
     </main>

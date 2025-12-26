@@ -34,7 +34,9 @@ code {
 }
 
 section {
-  padding-inline: 5rem;
+  @media (width >= 48rem /* 768px */) {
+        /* padding-inline: 5rem; */
+    }
 }
 
 h1 {

@@ -110,8 +110,8 @@ const AccountPage: React.FC = () => {
     dispatch(putProfile({
       token,
       payload: {
-        first_name: "User Edited",
-        last_name: "Nutech Edited",
+        first_name: form.getFieldValue("firstName"),
+        last_name: form.getFieldValue("lastName"),
       },
     }));
 
@@ -124,141 +124,135 @@ const AccountPage: React.FC = () => {
   };
 
   return (
-    <main>
+    <main className="min-h-screen">
       <Header />
 
-      <section className="w-[50%] mx-auto my-8">
-        {/* Avatar */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="relative">
-            <Avatar image={avatar} />
+      <section className="px-4 md:px-20">
+        <section className="max-w-md md:max-w-lg mx-auto my-8">
+          {/* Avatar */}
+          <div className="flex flex-col items-center mb-6">
+            <div className="relative">
+              <Avatar image={avatar} />
 
-            <button
-              className="absolute w-8 h-8 bottom-0 right-0 bg-white border rounded-full cursor-pointer"
-              title="Edit Avatar"
-              onClick={handleEditAvatar}
-            >
-              <EditOutlined />
-            </button>
+              <button
+                className="absolute w-8 h-8 bottom-0 right-0 bg-white border rounded-full
+                         flex items-center justify-center cursor-pointer"
+                title="Edit Avatar"
+                onClick={handleEditAvatar}
+              >
+                <EditOutlined />
+              </button>
 
-            {/* Hidden file input */}
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              onChange={handleFileChange}
-            />
+              {/* Hidden file input */}
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </div>
+
+            <h1 className="mt-4 text-lg md:text-xl font-semibold text-gray-900 text-center">
+              {form.getFieldValue("firstName")}{" "}
+              {form.getFieldValue("lastName")}
+            </h1>
           </div>
 
-          <h1 className="mt-4 text-xl font-semibold text-gray-900">
-            {form.getFieldValue("firstName")} {form.getFieldValue("lastName")}
-          </h1>
-        </div>
-
-        {/* Profile Form */}
-        <Form
-          form={form}
-          layout="vertical"
-          size="large"
-          className="w-full"
-          requiredMark={false}
-        >
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: "Email wajib diisi" },
-              { type: "email", message: "Format email tidak valid" },
-            ]}
+          {/* Profile Form */}
+          <Form
+            form={form}
+            layout="vertical"
+            size="large"
+            className="w-full"
+            requiredMark={false}
           >
-            <Input
-              prefix="@"
-              disabled
-              placeholder="masukkan email"
-            />
-          </Form.Item>
+            <Form.Item
+              name="email"
+              label="Email"
+              rules={[
+                { required: true, message: "Email wajib diisi" },
+                { type: "email", message: "Format email tidak valid" },
+              ]}
+            >
+              <Input prefix="@" disabled placeholder="masukkan email" />
+            </Form.Item>
 
-          <Form.Item
-            name="firstName"
-            label="Nama Depan"
-            rules={[{ required: true, message: "Nama depan wajib diisi" }]}
-          >
-            <Input
-              prefix={<UserOutlined />}
-              disabled={!isEditing}
-              placeholder="nama depan"
-            />
-          </Form.Item>
+            <Form.Item
+              name="firstName"
+              label="Nama Depan"
+              rules={[{ required: true, message: "Nama depan wajib diisi" }]}
+            >
+              <Input
+                prefix={<UserOutlined />}
+                disabled={!isEditing}
+                placeholder="nama depan"
+              />
+            </Form.Item>
 
-          <Form.Item
-            name="lastName"
-            label="Nama Belakang"
-            rules={[{ required: true, message: "Nama belakang wajib diisi" }]}
-          >
-            <Input
-              prefix={<UserOutlined />}
-              disabled={!isEditing}
-              placeholder="nama belakang"
-            />
-          </Form.Item>
+            <Form.Item
+              name="lastName"
+              label="Nama Belakang"
+              rules={[{ required: true, message: "Nama belakang wajib diisi" }]}
+            >
+              <Input
+                prefix={<UserOutlined />}
+                disabled={!isEditing}
+                placeholder="nama belakang"
+              />
+            </Form.Item>
 
-          {/* Buttons */}
-          {isEditing ? (
-            <>
-              <Form.Item>
-                <Button
-                  className="w-full mt-4"
-                  variant="secondary"
-                  size="sm"
-                  type="button"
-                  onClick={handleSave}
-                >
-                  Simpan
-                </Button>
-              </Form.Item>
+            {/* Buttons */}
+            <div className="space-y-3">
+              {isEditing ? (
+                <>
+                  <Button
+                    className="w-full"
+                    variant="secondary"
+                    size="sm"
+                    type="button"
+                    onClick={handleSave}
+                  >
+                    Simpan
+                  </Button>
 
-              <Form.Item>
-                <Button
-                  className="w-full"
-                  variant="primary"
-                  size="sm"
-                  type="button"
-                  onClick={handleBatal}
-                >
-                  Batalkan
-                </Button>
-              </Form.Item>
-            </>
-          ) : (
-            <>
-              <Form.Item>
-                <Button
-                  className="w-full mt-4"
-                  variant="secondary"
-                  size="sm"
-                  type="button"
-                  onClick={() => setIsEditing(true)}
-                  disabled={profileLoading}
-                >
-                  Edit
-                </Button>
-              </Form.Item>
+                  <Button
+                    className="w-full"
+                    variant="primary"
+                    size="sm"
+                    type="button"
+                    onClick={handleBatal}
+                  >
+                    Batalkan
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    className="w-full"
+                    variant="secondary"
+                    size="sm"
+                    type="button"
+                    onClick={() => setIsEditing(true)}
+                    disabled={profileLoading}
+                  >
+                    Edit
+                  </Button>
 
-              <Form.Item>
-                <Button
-                  className="w-full"
-                  variant="primary"
-                  size="sm"
-                  type="button"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
-              </Form.Item>
-            </>
-          )}
-        </Form>
+                  <Button
+                    className="w-full"
+                    variant="primary"
+                    size="sm"
+                    type="button"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </Button>
+                </>
+              )}
+            </div>
+          </Form>
+        </section>
       </section>
     </main>
   );

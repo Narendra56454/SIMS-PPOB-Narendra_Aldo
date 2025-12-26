@@ -31,15 +31,18 @@ export const WelcomeAndBalance = () => {
     }, [token, navigate]);
 
     return (
-        <div className="mt-4 flex justify-between items-center">
+        <div className="mt-6 flex flex-col md:flex-row gap-6 md:gap-0 md:justify-between md:items-center">
             {profileLoading && <p>Loading profile...</p>}
 
             <div>
-                <Avatar size={12} />
+                <Avatar image={profile?.profile_image} size={12} />
                 <p className="mt-2">Selamat Datang,</p>
-                <p className="font-semibold text-3xl">{profile?.first_name} {profile?.last_name}</p>
+                <p className="font-semibold text-2xl md:text-3xl">
+                    {profile?.first_name} {profile?.last_name}
+                </p>
             </div>
-            <div>
+
+            <div className="w-full md:w-auto">
                 <BalanceCard />
             </div>
         </div>

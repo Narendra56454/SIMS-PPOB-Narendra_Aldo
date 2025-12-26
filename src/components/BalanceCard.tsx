@@ -39,23 +39,22 @@ export const BalanceCard = () => {
     const balanceValue = balance?.balance ?? 0;
 
     return (
-        <div className="relative w-full min-w-150 rounded-2xl p-6 text-white bg-no-repeat bg-cover"
+        <div
+            className="relative w-full md:w-105 rounded-2xl p-4 md:p-6 text-white bg-no-repeat bg-cover"
             style={{ backgroundImage: `url(${background})` }}
         >
-            <div className="relative z-10">
-                <p className="text-sm opacity-90">Saldo anda</p>
+            <p className="text-sm opacity-90">Saldo anda</p>
 
-                <h2 className="mt-2 text-2xl font-bold tracking-widest">
-                    {balanceLoading
-                        ? "Loading..."
-                        : isHidden
-                            ? "Rp ••••••"
-                            : formatRupiah(balanceValue)}
-                </h2>
+            <h2 className="mt-2 text-xl md:text-2xl font-bold tracking-widest">
+                {balanceLoading
+                    ? "Loading..."
+                    : isHidden
+                        ? "Rp ••••••"
+                        : formatRupiah(balanceValue)}
+            </h2>
 
-                <div className="mt-3 flex items-center gap-2 text-sm" >
-                    Lihat Saldo <EyeOutlined onClick={handleClick} />
-                </div>
+            <div className="mt-3 flex items-center gap-2 text-sm cursor-pointer">
+                Lihat Saldo <EyeOutlined onClick={handleClick} />
             </div>
         </div>
     );

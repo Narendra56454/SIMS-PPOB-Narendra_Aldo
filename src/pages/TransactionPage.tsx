@@ -48,41 +48,56 @@ export const TransactionPage = () => {
     };
 
     return (
-        <main>
+        <main className="min-h-screen">
             <Header />
-            <section>
+
+            <section className="px-4 md:px-20">
                 <WelcomeAndBalance />
-            </section>
 
-            <section className="my-10">
-                <h1>Semua transaksi</h1>
+                <section className="my-10">
+                    <h1 className="text-xl md:text-2xl font-semibold">
+                        Semua transaksi
+                    </h1>
 
-                <div className="flex flex-col gap-4 mt-4">
-                    {data?.map((item: TransactionResponse, index) => (
-                        <div
-                            key={`${item.invoice_number}-${index}`}
-                            className="flex justify-between items-center px-4 py-2 border border-gray-200 rounded-lg"
-                        >
-                            <div className="space-y-1">
-                                <Amount type={item.transaction_type} value={item.total_amount} />
-                                <p className="text-xs text-gray-500">
-                                    {getDateOnly(item.created_on)} &nbsp; {getTimeOnly(item.created_on)} WIB
-                                </p>
+                    <div className="flex flex-col gap-4 mt-4">
+                        {data?.map((item: TransactionResponse, index) => (
+                            <div
+                                key={`${item.invoice_number}-${index}`}
+                                className="flex flex-col sm:flex-row sm:justify-between sm:items-center
+                         gap-3 px-4 py-3 border border-gray-200 rounded-lg"
+                            >
+                                {/* LEFT */}
+                                <div className="space-y-1">
+                                    <Amount
+                                        type={item.transaction_type}
+                                        value={item.total_amount}
+                                    />
+                                    <p className="text-xs text-gray-500">
+                                        {getDateOnly(item.created_on)} &nbsp;
+                                        {getTimeOnly(item.created_on)} WIB
+                                    </p>
+                                </div>
+
+                                {/* RIGHT */}
+                                <div className="text-sm text-gray-700 sm:text-right">
+                                    {item.description}
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-sm">{item.description}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {hasMore && (
-                    <div className="mt-4 text-center">
-                        <Button variant="transparent" onClick={loadMore} disabled={loading}>
-                            {loading ? "Loading..." : "Show more"}
-                        </Button>
+                        ))}
                     </div>
-                )}
+
+                    {hasMore && (
+                        <div className="mt-6 text-center">
+                            <Button
+                                variant="transparent"
+                                onClick={loadMore}
+                                disabled={loading}
+                            >
+                                {loading ? "Loading..." : "Show more"}
+                            </Button>
+                        </div>
+                    )}
+                </section>
             </section>
         </main>
     );

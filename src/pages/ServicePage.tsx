@@ -36,7 +36,7 @@ export const ServicePage = () => {
 
     const { data, error } = useSelector((state: RootState) => state.transaction);
     const { data: balanceData } = useSelector((state: RootState) => state.balance);
-    
+
     const balance = balanceData?.balance ?? 0;
     const invalidAmount = typeof amount === "number" && amount > balance;
 
@@ -53,53 +53,67 @@ export const ServicePage = () => {
     }
 
     return (
-        <main>
+        <main className="min-h-screen">
             <Header />
 
-            <section>
+            <section className="px-4 md:px-20">
                 <WelcomeAndBalance />
-            </section>
 
-            <section className="py-10 space-y-4">
-                <div>
-                    <p>Pembayaran</p>
-                    <div className="mt-2 flex items-center gap-2">
-                        <img src={service.service_icon} alt="Service Icon" className="w-8 h-8" />
-                        <h1>{service.service_name}</h1>
+                <section className="py-10 space-y-6 max-w-xl mx-auto">
+                    {/* HEADER */}
+                    <div>
+                        <p className="text-sm text-gray-600">Pembayaran</p>
+
+                        <div className="mt-2 flex items-center gap-3">
+                            <img
+                                src={service.service_icon}
+                                alt="Service Icon"
+                                className="w-8 h-8 object-contain"
+                            />
+                            <h1 className="text-lg md:text-xl font-semibold">
+                                {service.service_name}
+                            </h1>
+                        </div>
                     </div>
-                </div>
 
-                <Input
-                    prefix={<WalletOutlined className="mr-2" />}
-                    size="large"
-                    placeholder="masukan nominal"
-                    className="h-12"
-                    value={amount ? formatNumber(amount) : ""}
-                    // onChange={(e) => {
-                    //     const numericValue = parseNumber(e.target.value);
-                    //     setAmount(numericValue);
-                    // }}
-                    disabled
-                />
+                    {/* AMOUNT */}
+                    <Input
+                        prefix={<WalletOutlined className="mr-2" />}
+                        size="large"
+                        placeholder="masukan nominal"
+                        className="h-12"
+                        value={amount ? formatNumber(amount) : ""}
+                        disabled
+                    />
 
-                <Button
-                    className="w-full"
-                    variant="primary"
-                    size="sm"
-                    type="submit"
-                    onClick={() => setOpenPopUp(true)}
-                    disabled={invalidAmount}
-                >
-                    Bayar
-                </Button>
+                    {/* ACTION */}
+                    <Button
+                        className="w-full h-12"
+                        variant="primary"
+                        size="sm"
+                        type="submit"
+                        onClick={() => setOpenPopUp(true)}
+                        disabled={invalidAmount}
+                    >
+                        Bayar
+                    </Button>
+
+                    {invalidAmount && (
+                        <p className="text-sm text-red-600 text-center">
+                            Saldo tidak mencukupi
+                        </p>
+                    )}
+                </section>
             </section>
 
+            {/* CONFIRM POPUP */}
             {openPopUp && (
                 <ConfirmPopUp
                     header={`Bayar ${service.service_name} senilai`}
                     content={`${formatNumber(amount)} ?`}
                     onConfirm={handleConfirm}
-                    onClose={() => setOpenPopUp(false)} />
+                    onClose={() => setOpenPopUp(false)}
+                />
             )}
 
             {/* RESULT POPUP */}
@@ -112,5 +126,5 @@ export const ServicePage = () => {
                 />
             )}
         </main>
-    )
+    );
 }

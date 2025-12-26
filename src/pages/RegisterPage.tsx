@@ -44,21 +44,21 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <main className="min-h-screen flex">
+    <main className="min-h-screen flex flex-col md:flex-row">
       {/* LEFT SECTION */}
-      <section className="w-1/2 my-10 flex flex-col justify-center">
-        <div className="mb-4 self-center">
+      <section className="w-full md:w-1/2 flex flex-col justify-center my-10 md:my-4">
+        <div className="mb-6 self-center">
           <Logo size={24} />
         </div>
 
         <h1 className="text-2xl font-semibold text-gray-900 mb-8 text-center">
-          Lengkapi data untuk <br /> membuat akun
+          Lengkapi data untuk <br className="hidden sm:block" /> membuat akun
         </h1>
 
         <Form
           layout="vertical"
           size="large"
-          className="w-[80%] self-center"
+          className="w-full max-w-md self-center"
           onFinish={handleRegister}
         >
           <Form.Item
@@ -75,20 +75,14 @@ const RegisterPage: React.FC = () => {
             name="firstName"
             rules={[{ required: true, message: "Nama depan wajib diisi" }]}
           >
-            <Input
-              prefix={<UserOutlined />}
-              placeholder="nama depan"
-            />
+            <Input prefix={<UserOutlined />} placeholder="nama depan" />
           </Form.Item>
 
           <Form.Item
             name="lastName"
             rules={[{ required: true, message: "Nama belakang wajib diisi" }]}
           >
-            <Input
-              prefix={<UserOutlined />}
-              placeholder="nama belakang"
-            />
+            <Input prefix={<UserOutlined />} placeholder="nama belakang" />
           </Form.Item>
 
           <Form.Item
@@ -153,12 +147,12 @@ const RegisterPage: React.FC = () => {
         </p>
       </section>
 
-      {/* RIGHT SECTION */}
-      <section className="w-1/2 bg-red-50 flex items-center justify-center">
+      {/* RIGHT SECTION (hidden on mobile) */}
+      <section className="hidden md:flex w-1/2 bg-red-50 items-center justify-center">
         <img
           src={ilustrasi}
           alt="Ilustrasi Register"
-          className="max-w-105"
+          className="max-w-md w-full px-6"
         />
       </section>
     </main>
